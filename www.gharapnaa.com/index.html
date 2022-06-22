@@ -1,0 +1,2134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="author" content="Themezhub" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RentUP - Residence & Real Estate Template</title>
+    <!-- Custom CSS -->
+    <link href="http://www.gharapnaa.com/assets/css/styles.css?ver=1.4" rel="stylesheet">
+    <!-- ============================================================== -->
+    <!-- All Jquery -->
+    <!-- ============================================================== -->
+    <script src="http://www.gharapnaa.com/assets/js/jquery.min.js"></script>
+    <script src="http://www.gharapnaa.com/assets/js/popper.min.js"></script>
+    <script src="http://www.gharapnaa.com/assets/js/bootstrap.min.js"></script>
+    <script src="http://www.gharapnaa.com/assets/js/ion.rangeSlider.min.js"></script>
+    <!-- <script src="http://www.gharapnaa.com/assets/js/select2.min.js"></script>
+         -->
+    <script src="http://www.gharapnaa.com/assets/js/jquery.magnific-popup.min.js"></script>
+    <script src="http://www.gharapnaa.com/assets/js/slick.js"></script>
+    <script src="http://www.gharapnaa.com/assets/js/slider-bg.js"></script>
+    <script src="http://www.gharapnaa.com/assets/js/lightbox.js"></script>
+    <script src="http://www.gharapnaa.com/assets/js/imagesloaded.js"></script>
+    <script src="http://www.gharapnaa.com/assets/js/daterangepicker.js"></script>
+    <script src="http://www.gharapnaa.com/assets/js/custom.js"></script>
+    <!-- ============================================================== -->
+    <!-- This page plugins -->
+    <!-- ============================================================== -->
+    <script type="text/javascript">
+        jQuery(document).ready(function($) {
+
+            $(document).on('click', '#btnregister', function(event) {
+                event.preventDefault();
+                $(".has-error").removeClass("has-error");
+                valid = true;
+                frmdata = $("#frmregister").serialize();
+                $(".requiredre").each(function(index, el) {
+                    if (!$(el).val()) {
+                        valid = false;
+                        $(this).addClass('has-error');
+                    }
+                });
+
+                if (valid && matchPassword('reg')) {
+                    $(".notify").css('display', 'inherit').removeClass('text-success').removeClass('text-danger');
+                    $.ajax({
+                            url: 'http://www.gharapnaa.com/ajax/prop-ajax.php',
+                            type: 'POST',
+                            data: frmdata,
+                            success: function(response) {
+                                //console.log(response);	
+
+
+                                jsn = $.parseJSON(response);
+                                if (jsn.status == 'success') {
+                                    $("#frmregister")[0].reset();
+                                    location.reload();
+                                }
+                                $(".notify").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+
+                                /* if(jsn.sts=="01"){
+                                location.reload();
+
+                                }
+                                else if(jsn.sts=="02"){
+
+                                	$(".noty").html("Email/Mobile Already Registered");
+                                }
+                                else{
+                                	$(".noty").html("Check Credentials");
+                                } */
+                            }
+                        })
+                        .done(function() {
+                            //console.log("success");
+                            //setTimeout(function(){$(".noty").html(""); }, 3000);
+
+                        });
+                }
+            });
+
+            /* ====== OTP Send to Client ======== */
+            function commonOTPSend(email = '', phone = 0, id = '', isValid = 1) {
+                if (id != '' && (email != '' || phone > 0)) {
+                    $("#" + id).addClass('disabled');
+                    var isValid = (isValid == 1 || isValid == '1') ? 'register' : 'login';
+                    $(".notify-otp").css('display', 'inherit').removeClass('text-success').removeClass('text-danger');
+                    $.ajax({
+                            url: 'http://www.gharapnaa.com/ajax/prop-ajax.php',
+                            type: 'POST',
+                            data: 'action=sendotp&email=' + email + '&phone=' + phone + '&valid=' + isValid,
+                            success: function(response) {
+                                //console.log(response);	
+                                jsn = $.parseJSON(response);
+                                if (jsn.status == 'success') {
+                                    //$("#frmregister")[0].reset();
+                                    //location.reload();
+                                    $(".notify-otp").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                                }
+                                if (jsn.status == 'error') {
+                                    $(".notify-otp").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                                }
+                                setTimeout(function() {
+                                    $('#' + id).removeClass('disabled');
+                                }, 60000);
+                            }
+                        })
+                        .done(function() {
+                            //console.log("success");
+                            //setTimeout(function(){$(".noty").html(""); }, 3000);
+
+                        });
+                }
+            }
+
+            /* ========== Register OTP to mail ===== */
+            $(document).on('click', '#regMailOTP', function(event) {
+                event.preventDefault();
+                var email = $("#emailid").val();
+                phone = 0;
+                commonOTPSend(email, phone, "emailid", 1);
+            });
+            /* ========== Register OTP to mail ===== */
+
+
+            /* ========== OTP to mail ===== */
+            $(document).on('click', '#mailOTP', function(event) {
+                event.preventDefault();
+                var email = $("#forgot_email").val();
+                phone = 0;
+                commonOTPSend(email, phone, "forgot_email", 0);
+                /* if(email!='')
+                {
+                	$("#mailOTP").addClass('disabled');
+                	$(".notify-otp").css('display', 'inherit').removeClass('text-success').removeClass('text-danger');
+                	$.ajax({
+                		url: 'http://www.gharapnaa.com/ajax/prop-ajax.php',
+                		type: 'POST',
+                		data: 'action=sendotp&email='+email+'&phone='+phone,
+                		success:function(response){
+                			//console.log(response);	
+                			jsn=$.parseJSON(response);
+                			if(jsn.status=='success')
+                			{
+                				//$("#frmregister")[0].reset();
+                				//location.reload();
+                				$(".notify-otp").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                			}
+                			if(jsn.status=='error')
+                			{
+                				$(".notify-otp").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                			}
+                			setTimeout(function(){
+                				$('#mailOTP').removeClass('disabled');
+                			},60000);
+                		}
+                	})
+                	.done(function() {
+                		//console.log("success");
+                		//setTimeout(function(){$(".noty").html(""); }, 3000);
+
+                	});
+                } */
+            });
+            /* ====== OTP Send to Client ======== */
+
+
+            /* ====== OTP Verify to Client ======== */
+            function commonOTPVerify(otp = '', btnId = '', hideTab = '') {
+                if (btnId != '' && otp != '') {
+                    $(".notify-verifyotp").css('display', 'inherit').removeClass('text-success').removeClass('text-danger');
+                    $.ajax({
+                            url: 'http://www.gharapnaa.com/ajax/prop-ajax.php',
+                            type: 'POST',
+                            data: 'action=verifyotp&otp=' + otp,
+                            success: function(response) {
+                                //console.log(response);	
+                                jsn = $.parseJSON(response);
+                                if (jsn.status == 'success') {
+                                    if (btnId == 'btnreset') {
+                                        var codeHtml = '<div class="form-group">' +
+                                            '<label>Password</label><span class="text-danger"> * <span id="err_pwd1" class="err-msg"></span></span>' +
+                                            '<div class="input-with-icon">' +
+                                            '<input type="password" class="form-control requiredpwd mand-err" name="pwd" id="pwd1" onblur="matchPassword(\'reset\');" style="padding-left: 26px !important;">' +
+                                            '<i class="ti-unlock"></i>' +
+                                            '</div>' +
+                                            '</div>' +
+                                            '<div class="form-group">' +
+                                            '<label>Confirm Password</label><span class="text-danger"> * <span id="err_cpwd1" class="err-msg"></span></span>' +
+                                            '<div class="input-with-icon">' +
+                                            '<input type="password" class="form-control requiredpwd mand-err" name="cpwd" id="cpwd1" onblur="matchPassword(\'reset\');" style="padding-left: 26px !important;">' +
+                                            '<i class="ti-unlock"></i>' +
+                                            '</div>' +
+                                            '</div>';
+                                        $("#enable-pwd").html(codeHtml);
+                                    }
+
+                                    if (hideTab == 'enableReg') {
+                                        $("#hideReg").hide();
+                                        $("#enableReg").show();
+                                    }
+                                    $(".notify-verifyotp").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                                    $("#" + btnId).removeClass("disabled");
+                                }
+                                if (jsn.status == 'error') {
+                                    $("#" + btnId).addClass("disabled");
+                                    $(".notify-verifyotp").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                                }
+                            }
+                        })
+                        .done(function() {
+                            //console.log("success");
+                            //setTimeout(function(){$(".noty").html(""); }, 3000);
+
+                        });
+                }
+            }
+
+            $(document).on('click', '#regVerifyOTP', function(event) {
+                event.preventDefault();
+                var otp = $("#reg_verify_otp").val();
+                commonOTPVerify(otp, "btnregister", "enableReg");
+                //commonOTPVerify(otp, "btnreset");
+            });
+
+            $(document).on('click', '#verifyOTP', function(event) {
+                event.preventDefault();
+                var otp = $("#verify_otp").val();
+                commonOTPVerify(otp, "btnreset");
+                /* if(otp!='')
+                {
+                	$(".notify-verifyotp").css('display', 'inherit').removeClass('text-success').removeClass('text-danger');
+                	$.ajax({
+                		url: 'http://www.gharapnaa.com/ajax/prop-ajax.php',
+                		type: 'POST',
+                		data: 'action=verifyotp&otp='+otp,
+                		success:function(response){
+                			//console.log(response);	
+                			jsn=$.parseJSON(response);
+                			if(jsn.status=='success')
+                			{
+                				var codeHtml = '<div class="form-group">'+
+                						'<label>Password</label><span class="text-danger"> * <span id="err_pwd1" class="err-msg"></span></span>'+
+                						'<div class="input-with-icon">'+
+                							'<input type="password" class="form-control requiredpwd mand-err" name="pwd" id="pwd1" onblur="matchPassword(\'reset\');" style="padding-left: 26px !important;">'+
+                							'<i class="ti-unlock"></i>'+
+                						'</div>'+
+                					'</div>'+
+                					'<div class="form-group">'+
+                						'<label>Confirm Password</label><span class="text-danger"> * <span id="err_cpwd1" class="err-msg"></span></span>'+
+                						'<div class="input-with-icon">'+
+                							'<input type="password" class="form-control requiredpwd mand-err" name="cpwd" id="cpwd1" onblur="matchPassword(\'reset\');" style="padding-left: 26px !important;">'+
+                							'<i class="ti-unlock"></i>'+
+                						'</div>'+
+                					'</div>';
+                				$("#enable-pwd").html(codeHtml);
+                				$(".notify-verifyotp").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                				$("#btnreset").removeClass("disabled");
+                			}
+                			if(jsn.status=='error')
+                			{
+                				$("#btnreset").addClass("disabled");
+                				$(".notify-verifyotp").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                			}
+                		}
+                	})
+                	.done(function() {
+                		//console.log("success");
+                		//setTimeout(function(){$(".noty").html(""); }, 3000);
+
+                	});
+                } */
+            });
+            /* ========== OTP to mail ===== */
+
+            /* ====== OTP Verify to Client ======== */
+            /* ========= Reset Password ============ */
+            $(document).on("click", "#btnreset", function(event) {
+                event.preventDefault();
+                pvalid = true;
+                $(".has-error").removeClass("has-error");
+                $(".txt-error").removeClass("txt-error");
+
+                $(".requiredpwd").each(function(index, el) {
+                    if (!$(el).val()) {
+                        pvalid = false;
+                        $(this).addClass("has-error");
+                    }
+                });
+
+                if (pvalid && matchPassword('reset')) {
+                    $(".notify-reset").css('display', 'inherit').removeClass('text-success').removeClass('text-danger');
+                    frmdata = $("#frmreset").serialize();
+
+                    $.ajax({
+                            url: 'http://www.gharapnaa.com/ajax/prop-ajax.php',
+                            type: 'POST',
+                            data: frmdata,
+                            success: function(response) {
+                                //console.log(response);	
+
+                                jsn = $.parseJSON(response);
+                                if (jsn.status == 'success') {
+                                    $(".notify-reset").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                                    location.reload();
+                                }
+                                if (jsn.status == 'error') {
+                                    $(".notify-reset").addClass(jsn.type).html(jsn.message).fadeOut(10000);
+                                }
+
+                                /* jsn=$.parseJSON(response);
+                                if(jsn.sts=="01"){
+                                $(".notyre").html("Successfully Reset Password");
+                                $("#pills-reset,#pills-signup").addClass("fade"); 
+                                $("#pills-reset,#pills-signup").removeClass("active show"); 
+                                $("#pills-login").addClass("active show"); 
+                                }
+                                else{$(".notyre").html("User Name not exist")} */
+                            }
+                        })
+                        .done(function() {
+                            //console.log("success");
+                            //setTimeout(function(){$(".notyre").html(""); }, 3000);
+
+                        });
+                }
+            });
+            /* ========= Reset Password ============ */
+
+            $(document).on('click', '#btnlogin', function(event) {
+                event.preventDefault();
+                lvalid = true;
+                $(".has-error").removeClass("has-error");
+                $(".lrequired").each(function(index, el) {
+                    if (!$(el).val()) {
+                        lvalid = false;
+                        $(this).addClass('has-error');
+                    }
+                });
+                //alert(lvalid)
+                if (lvalid) {
+                    frmdata = $("#frmlogin").serialize();
+                    $.ajax({
+                            url: 'http://www.gharapnaa.com/ajax/prop-ajax.php',
+                            type: 'POST',
+                            data: frmdata,
+                            success: function(response) {
+                                //console.log(response);	
+
+                                jsn = $.parseJSON(response);
+                                if (jsn.sts == "01") {
+                                    location.reload();
+
+                                } else {
+                                    $(".noty").html("Check Credentials");
+                                }
+                            }
+                        })
+                        .done(function() {
+                            console.log("success");
+                            setTimeout(function() {
+                                $(".noty").html("");
+                            }, 3000);
+                        });
+                }
+
+            });
+
+
+            $(document).on('click', '.btnwish', function(event) {
+                event.preventDefault();
+                btn = $(this);
+                prid = $(this).data("id");
+                wlid = $(this).data("wlid");
+                uid = "";
+                if (!uid) {
+                    $("#login").modal();
+                } else {
+                    $.ajax({
+                            url: 'http://www.gharapnaa.com/ajax/prop-ajax.php',
+                            type: 'POST',
+                            data: {
+                                "action": "addwishlist",
+                                "prid": prid,
+                                "wlid": wlid
+                            },
+                            success: function(response) {
+                                console.log(response);
+
+                                jsn = $.parseJSON(response);
+                                if (jsn.sts == "01") {
+                                    btn.toggleClass("text-danger");
+                                }
+
+                            }
+                        })
+                        .done(function() {
+                            console.log("success");
+                            setTimeout(function() {
+                                $(".noty").html("");
+                            }, 3000);
+
+                        });
+                }
+            });
+
+
+            $(document).on("click", "#pills-reset-tab", function() {
+                $("#pills-login,#pills-signup").addClass("fade");
+            });
+            $(document).on("click", "#pills-login-tab", function() {
+                $("#pills-reset,#pills-signup").addClass("fade");
+                $("#pills-reset,#pills-signup").removeClass("active show");
+            });
+            $(document).on("click", "#pills-signup-tab", function() {
+                $("#pills-reset,#pills-login").addClass("fade");
+                $("#pills-reset,#pills-login").removeClass("active show");
+            });
+        });
+    </script>
+</head>
+
+<body class="yellow-skin">
+    <!-- ============================================================== -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================== -->
+    <div class="preloader"></div>
+    <!-- ============================================================== -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <div id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Top header  -->
+        <!-- ============================================================== -->
+        <!-- Start Navigation -->
+        <div class="header header-light">
+            <div class="container">
+                <nav id="navigation" class="navigation navigation-landscape">
+                    <div class="nav-header">
+                        <a class="nav-brand" href="http://www.gharapnaa.com">
+						<img src="http://www.gharapnaa.com/assets/img/logo.png" class="logo" alt="" />
+                     </a>
+                        <div class="nav-toggle"></div>
+                        <div class="mobile_nav">
+                            <ul>
+
+                                <li><a href="#" data-toggle="modal" data-target="#login"><i class="fas fa-user-circle fa-lg"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="nav-menus-wrapper " style="transition-property: none;">
+                        <ul class="nav-menu  align-to-right">
+                            <li class="active c-list"><a href="http://www.gharapnaa.com/" class="">Home</a></li>
+                            <li class=" c-list"><a href="http://www.gharapnaa.com/property-list" class="">Buy</a></li>
+                            <li class=" c-list"><a href="http://www.gharapnaa.com/about-us" class="">About</a></li>
+                            <li class=" c-list"><a href="http://www.gharapnaa.com/contact" class="">Contact Us</a></li>
+                            <li class=" c-list"><a href="http://www.gharapnaa.com/add-property" class="theme-cl btn-class"><i class="fas fa-plus-circle mr-1"></i>Add Free listing</a></li>
+                            <li class="c-list"><a href="#" data-toggle="modal" data-target="#login"><i class="fas fa-sign-in-alt mr-1"></i>Sign In</a></li>
+                            <!--<li class="active"><a href="http://www.gharapnaa.com/">Home</a>
+                        </li>
+                        <li><a href="http://www.gharapnaa.com/property-list">Buy</a></li>
+                        <li><a href="http://www.gharapnaa.com/add-property">Sell</a></li>
+                        <li><a href="http://www.gharapnaa.com/contact">Contact Us</a>
+                        </li>
+                        <li class="add-listing" >
+                           <a href="http://www.gharapnaa.com/add-property" style="border-radius: 5px;
+                              top: 16px;
+                              padding: 12px;
+                              margin-left: 10px;
+                              background: #56afff;
+                              color: white !important;"  class="theme-cl">
+                           <i class="fas fa-plus-circle mr-1"></i>Add Free listing
+                           </a>
+                        </li>
+                                                <li><a href="#" data-toggle="modal" data-target="#login"><i class="fas fa-sign-in-alt mr-1"></i>Sign In</a></li>
+                         -->
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <!-- End Navigation -->
+        <div class="clearfix"></div>
+        <!-- ============================================================== -->
+        <!-- Top header  -->
+        <!-- ============================================================== -->
+        <!-- ============================ Hero Banner  Start================================== -->
+        <div class="image-cover hero_banner" style="background:url(assets/img/banner-3.png) no-repeat;" data-overlay="0">
+            <div class="container">
+                <h1 class="big-header-capt mb-0">Search Your Next Home</h1>
+                <p class="text-center mb-4">Find new & featured property located in your local city.</p>
+                <!-- Type -->
+                <div class="row justify-content-center">
+                    <div class="col-xl-10 col-lg-12 col-md-12">
+                        <div class="full_search_box nexio_search lightanic_search hero_search-radius modern">
+                            <div class="search_hero_wrapping">
+                                <form action="http://www.gharapnaa.com/property-list" method="POST">
+                                    <div class="row">
+                                        <div class="col-lg-5 col-md-5 col-sm-12">
+                                            <div class="form-group">
+                                                <label>Type of property</label>
+                                                <div class="input-with-icon">
+                                                    <select id="ptypes" class="form-control inputselct" name="ptypes">
+													<option value="">Select</option>
+													<option value="1">Apartment</option><option value="2">Independent Home</option><option value="4">Villas</option><option value="3">Plot</option><option value="5">Agriculture Land</option>												</select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="form-group">
+                                                <label>City</label>
+                                                <div class="input-with-icon">
+                                                    <select id="txtloc" class="form-control inputselct" name="txtloc">
+													<option value="">All Location</option>
+																											<option value="1">Bengaluru</option>
+																											<option value="2">Hyderabad</option>
+																											<option value="3">Pune</option>
+																											<option value="4">Chennai</option>
+																											<option value="5">Delhi</option>
+																											<option value="6">Gurgaon</option>
+																											<option value="7">Noida</option>
+																											<option value="8">Kolkata</option>
+																											<option value="9">Ahmedabad</option>
+																											<option value="10">Thane</option>
+																											<option value="11">Navi Mumbai</option>
+																											<option value="12">Other Cities</option>
+																											<option value="13">Abu Dhabi</option>
+																											<option value="14">Adilabad</option>
+																											<option value="15">Adoni</option>
+																											<option value="16">Agarmalwa</option>
+																											<option value="17">Agartala</option>
+																											<option value="18">Agra</option>
+																											<option value="19">Ahmednagar</option>
+																											<option value="20">Aizawl</option>
+																											<option value="21">Ajman</option>
+																											<option value="22">Ajmer</option>
+																											<option value="23">Akola</option>
+																											<option value="24">Alappuzha</option>
+																											<option value="25">Alibag</option>
+																											<option value="26">Aligarh</option>
+																											<option value="27">Alipurduar</option>
+																											<option value="28">Alirajpur</option>
+																											<option value="29">Allahabad</option>
+																											<option value="30">Almora</option>
+																											<option value="31">Aluva</option>
+																											<option value="32">Alwar</option>
+																											<option value="33">Ambala</option>
+																											<option value="34">Ambedkar Nagar</option>
+																											<option value="35">Amethi</option>
+																											<option value="36">Amravati</option>
+																											<option value="37">Amreli</option>
+																											<option value="38">Amritsar</option>
+																											<option value="39">Amroha</option>
+																											<option value="40">Anand</option>
+																											<option value="41">Anantapur</option>
+																											<option value="42">Anantnag</option>
+																											<option value="43">Angul</option>
+																											<option value="44">Ankleshwar</option>
+																											<option value="45">Anuppur</option>
+																											<option value="46">Araria</option>
+																											<option value="47">Aravalli</option>
+																											<option value="48">Ariyalur</option>
+																											<option value="49">Arrah</option>
+																											<option value="50">Arwal</option>
+																											<option value="51">Asansol</option>
+																											<option value="52">Ashoknagar</option>
+																											<option value="53">Auraiya</option>
+																											<option value="54">Aurangabad</option>
+																											<option value="55">Avinashi</option>
+																											<option value="56">Azamgarh</option>
+																											<option value="57">Baddi</option>
+																											<option value="58">Badgam</option>
+																											<option value="59">Bagalkot</option>
+																											<option value="60">Bageshwar</option>
+																											<option value="61">Baghpat</option>
+																											<option value="62">Bagru</option>
+																											<option value="63">Bahadurgarh</option>
+																											<option value="64">Bahraich</option>
+																											<option value="65">Baijnath</option>
+																											<option value="66">Baksa</option>
+																											<option value="67">Balaghat</option>
+																											<option value="68">Balangir</option>
+																											<option value="69">Balasore</option>
+																											<option value="70">Ballia</option>
+																											<option value="71">Balod</option>
+																											<option value="72">Baloda Bazar</option>
+																											<option value="73">Balrampur</option>
+																											<option value="74">Banaskantha</option>
+																											<option value="75">Banda</option>
+																											<option value="76">Bandipora</option>
+																											<option value="77">Banka</option>
+																											<option value="78">Bankura</option>
+																											<option value="79">Banswara</option>
+																											<option value="80">Barabanki</option>
+																											<option value="81">Baramati</option>
+																											<option value="82">Baramulla</option>
+																											<option value="83">Baran</option>
+																											<option value="84">Bardhaman</option>
+																											<option value="85">Bareilly</option>
+																											<option value="86">Bargarh</option>
+																											<option value="87">Barmer</option>
+																											<option value="88">Barnala</option>
+																											<option value="89">Barpeta</option>
+																											<option value="90">Barwani</option>
+																											<option value="91">Bastar</option>
+																											<option value="92">Basti</option>
+																											<option value="93">Bathinda</option>
+																											<option value="94">Bauda</option>
+																											<option value="95">Beawar</option>
+																											<option value="96">Beed</option>
+																											<option value="97">Begusarai</option>
+																											<option value="98">Belgaum</option>
+																											<option value="99">Bellary</option>
+																											<option value="100">Bemetara</option>
+																											<option value="101">Berhampore</option>
+																											<option value="102">Bettiah</option>
+																											<option value="103">Betul</option>
+																											<option value="104">Bhadohi</option>
+																											<option value="105">Bhadrak</option>
+																											<option value="106">Bhagalpur</option>
+																											<option value="107">Bhandara</option>
+																											<option value="108">Bharatpur</option>
+																											<option value="109">Bharuch</option>
+																											<option value="110">Bhatapara</option>
+																											<option value="111">Bhavnagar</option>
+																											<option value="112">Bhilai</option>
+																											<option value="113">Bhilwara</option>
+																											<option value="114">Bhimavaram</option>
+																											<option value="115">Bhind</option>
+																											<option value="116">Bhiwadi</option>
+																											<option value="117">Bhiwani</option>
+																											<option value="118">Bhojpur</option>
+																											<option value="119">Bhopal</option>
+																											<option value="120">Bhubaneswar</option>
+																											<option value="121">Bhupalpally</option>
+																											<option value="122">Bidar</option>
+																											<option value="123">Bihar Sharif</option>
+																											<option value="124">Bijapur</option>
+																											<option value="125">Bijnor</option>
+																											<option value="126">Bikaner</option>
+																											<option value="127">Bilaspur</option>
+																											<option value="128">Bilimora</option>
+																											<option value="129">Birbhum</option>
+																											<option value="130">Bishnupur</option>
+																											<option value="131">Bokaro</option>
+																											<option value="132">Bolpur-Santiniketan</option>
+																											<option value="133">Bongaigaon</option>
+																											<option value="134">Botad</option>
+																											<option value="135">Brajrajnagar</option>
+																											<option value="136">Budaun</option>
+																											<option value="137">Bulandshahr</option>
+																											<option value="138">Buldhana</option>
+																											<option value="139">Bundi</option>
+																											<option value="140">Burhanpur</option>
+																											<option value="141">Buxar</option>
+																											<option value="142">Cachar</option>
+																											<option value="143">Chachaura-Binaganj</option>
+																											<option value="144">Chamarajanagar</option>
+																											<option value="145">Chamba</option>
+																											<option value="146">Chamoli</option>
+																											<option value="147">Champawat</option>
+																											<option value="148">Champhai</option>
+																											<option value="149">Chandel</option>
+																											<option value="150">Chandigarh</option>
+																											<option value="151">Chandrapur</option>
+																											<option value="152">Changlang</option>
+																											<option value="153">Charkhi Dadri</option>
+																											<option value="154">Chatra</option>
+																											<option value="155">Chhapra</option>
+																											<option value="156">Chhatarpur</option>
+																											<option value="157">Chhindwara</option>
+																											<option value="158">Chhota Udepur</option>
+																											<option value="159">Chickmagaluru</option>
+																											<option value="160">Chiplun</option>
+																											<option value="161">Chirang</option>
+																											<option value="162">Chitradurga</option>
+																											<option value="163">Chitrakoot</option>
+																											<option value="164">Chittoor</option>
+																											<option value="165">Chittorgarh</option>
+																											<option value="166">Churachandpur</option>
+																											<option value="167">Churu</option>
+																											<option value="168">Coimbatore</option>
+																											<option value="169">Cooch Behar</option>
+																											<option value="170">Coorg</option>
+																											<option value="171">Cuddalore</option>
+																											<option value="172">Cuttack</option>
+																											<option value="173">Cuttack</option>
+																											<option value="174">Dahegam</option>
+																											<option value="175">Dahod</option>
+																											<option value="176">Dakshin Dinajpur</option>
+																											<option value="177">Dakshina Kannada</option>
+																											<option value="178">Daltonganj</option>
+																											<option value="179">Daman</option>
+																											<option value="180">Damoh</option>
+																											<option value="181">Dang</option>
+																											<option value="182">Dantewada</option>
+																											<option value="183">Dapoli</option>
+																											<option value="184">Darbhanga</option>
+																											<option value="185">Darjeeling</option>
+																											<option value="186">Darrang</option>
+																											<option value="187">Datia</option>
+																											<option value="188">Daund</option>
+																											<option value="189">Dausa</option>
+																											<option value="190">Davanagere</option>
+																											<option value="191">Dehradun</option>
+																											<option value="192">Dehri On Sone</option>
+																											<option value="193">Deogarh</option>
+																											<option value="194">Deoghar</option>
+																											<option value="195">Deoria</option>
+																											<option value="196">Dera Bassi</option>
+																											<option value="197">Devbhoomi Dwarka</option>
+																											<option value="198">Dewas</option>
+																											<option value="199">Dhalai</option>
+																											<option value="200">Dhamtari</option>
+																											<option value="201">Dhanbad</option>
+																											<option value="202">Dhar</option>
+																											<option value="203">Dharamsala</option>
+																											<option value="204">Dharmapuri</option>
+																											<option value="205">Dharuhera</option>
+																											<option value="206">Dharwad</option>
+																											<option value="207">Dhemaji</option>
+																											<option value="208">Dhenkanal</option>
+																											<option value="209">Dholera</option>
+																											<option value="210">Dholka</option>
+																											<option value="211">Dholpur</option>
+																											<option value="212">Dhubri</option>
+																											<option value="213">Dhule</option>
+																											<option value="214">Dibang Valley</option>
+																											<option value="215">Dibrugarh</option>
+																											<option value="216">Dima Hasao</option>
+																											<option value="217">Dimapur</option>
+																											<option value="218">Dindigul</option>
+																											<option value="219">Dindori</option>
+																											<option value="220">Diu</option>
+																											<option value="221">Doda</option>
+																											<option value="222">Dubai</option>
+																											<option value="223">Dumka</option>
+																											<option value="224">Dungarpur</option>
+																											<option value="225">Durg</option>
+																											<option value="226">Durgapur</option>
+																											<option value="227">Dwarka</option>
+																											<option value="228">East Garo Hills</option>
+																											<option value="229">East Godavari</option>
+																											<option value="230">East Jaintia Hills</option>
+																											<option value="231">East Kameng</option>
+																											<option value="232">East Kameng</option>
+																											<option value="233">East Khasi Hills</option>
+																											<option value="234">East Siang</option>
+																											<option value="235">East Sikkim</option>
+																											<option value="236">East Singhbhum</option>
+																											<option value="237">Eluru</option>
+																											<option value="238">Ernakulam</option>
+																											<option value="239">Erode </option>
+																											<option value="240">Etah</option>
+																											<option value="241">Etawah</option>
+																											<option value="242">Faizabad</option>
+																											<option value="243">Faridabad</option>
+																											<option value="244">Faridkot</option>
+																											<option value="245">Farrukhabad</option>
+																											<option value="246">Fatehabad</option>
+																											<option value="247">Fatehgarh Sahib</option>
+																											<option value="248">Fatehpur</option>
+																											<option value="249">Fazilka</option>
+																											<option value="250">Firozabad</option>
+																											<option value="251">Firozpur</option>
+																											<option value="252">Gadag</option>
+																											<option value="253">Gadchiroli</option>
+																											<option value="254">Gajapati</option>
+																											<option value="255">Gajraula</option>
+																											<option value="256">Gandhinagar</option>
+																											<option value="257">Gangtok</option>
+																											<option value="258">Ganjam</option>
+																											<option value="259">Garhwa</option>
+																											<option value="260">Gariaband</option>
+																											<option value="261">Gaya</option>
+																											<option value="262">Ghaziabad</option>
+																											<option value="263">Ghazipur</option>
+																											<option value="264">Gir Somnath</option>
+																											<option value="265">Giridih</option>
+																											<option value="266">Goa</option>
+																											<option value="267">Goalpara</option>
+																											<option value="268">Godda</option>
+																											<option value="269">Golaghat</option>
+																											<option value="270">Gomati</option>
+																											<option value="271">Gonda</option>
+																											<option value="272">Gondal</option>
+																											<option value="273">Gondia</option>
+																											<option value="274">Gopalganj</option>
+																											<option value="275">Gorakhpur</option>
+																											<option value="276">Greater Noida</option>
+																											<option value="277">Gudivada</option>
+																											<option value="278">Gulbarga</option>
+																											<option value="279">Gumla</option>
+																											<option value="280">Guna</option>
+																											<option value="281">Guntakal</option>
+																											<option value="282">Guntur</option>
+																											<option value="283">Gurdaspur</option>
+																											<option value="284">Guruvayoor</option>
+																											<option value="285">Guwahati</option>
+																											<option value="286">Gwalior</option>
+																											<option value="287">Hailakandi</option>
+																											<option value="288">Haldia</option>
+																											<option value="289">Halol</option>
+																											<option value="290">Hamirpur</option>
+																											<option value="291">Hanumangarh</option>
+																											<option value="292">Hapur</option>
+																											<option value="293">Harda</option>
+																											<option value="294">Hardoi</option>
+																											<option value="295">Haridwar</option>
+																											<option value="296">Hassan</option>
+																											<option value="297">Hathras</option>
+																											<option value="298">Haveri</option>
+																											<option value="299">Hazaribagh</option>
+																											<option value="300">Himmatnagar</option>
+																											<option value="301">Hindupur</option>
+																											<option value="302">Hingoli</option>
+																											<option value="303">Hissar</option>
+																											<option value="304">Hnahthial</option>
+																											<option value="305">Hodal</option>
+																											<option value="306">Hojai</option>
+																											<option value="307">Hoshangabad</option>
+																											<option value="308">Hoshiarpur</option>
+																											<option value="309">Hospet</option>
+																											<option value="310">Hosur</option>
+																											<option value="311">Hubli</option>
+																											<option value="312">Idukki</option>
+																											<option value="313">Igatpuri</option>
+																											<option value="314">Imphal</option>
+																											<option value="315">Indapur</option>
+																											<option value="316">Indore</option>
+																											<option value="317">Jabalpur</option>
+																											<option value="318">Jagadhri</option>
+																											<option value="319">Jagatsinghpur</option>
+																											<option value="320">Jagdalpur</option>
+																											<option value="321">Jagraon</option>
+																											<option value="322">Jagtial</option>
+																											<option value="323">Jaipur</option>
+																											<option value="324">Jaisalmer</option>
+																											<option value="325">Jajpur</option>
+																											<option value="326">Jalandhar</option>
+																											<option value="327">Jalaun</option>
+																											<option value="328">Jalgaon</option>
+																											<option value="329">Jalna</option>
+																											<option value="330">Jalore</option>
+																											<option value="331">Jalpaiguri</option>
+																											<option value="332">Jammu</option>
+																											<option value="333">Jamnagar</option>
+																											<option value="334">Jamshedpur</option>
+																											<option value="335">Jamtara</option>
+																											<option value="336">Jamui</option>
+																											<option value="337">Jangaon</option>
+																											<option value="338">Janjgir-Champa</option>
+																											<option value="339">Jashpur</option>
+																											<option value="340">Jaunpur</option>
+																											<option value="341">Jehanabad</option>
+																											<option value="342">Jhabua</option>
+																											<option value="343">Jhajjar</option>
+																											<option value="344">Jhalawar</option>
+																											<option value="345">Jhansi</option>
+																											<option value="346">Jhargram</option>
+																											<option value="347">Jharsuguda</option>
+																											<option value="348">Jhunjhunu</option>
+																											<option value="349">Jind</option>
+																											<option value="350">Jiribam</option>
+																											<option value="351">Jodhpur</option>
+																											<option value="352">Jorhat</option>
+																											<option value="353">Junagadh</option>
+																											<option value="354">Kabirdham</option>
+																											<option value="355">Kadapa</option>
+																											<option value="356">Kaimur</option>
+																											<option value="357">Kaithal</option>
+																											<option value="358">Kakching</option>
+																											<option value="359">Kakinada</option>
+																											<option value="360">Kalahandi</option>
+																											<option value="361">Kalimpong</option>
+																											<option value="362">Kallakurichi</option>
+																											<option value="363">Kalol</option>
+																											<option value="364">Kamareddy</option>
+																											<option value="365">Kamjong</option>
+																											<option value="366">Kamrup</option>
+																											<option value="367">Kanchipuram</option>
+																											<option value="368">Kandhamal</option>
+																											<option value="369">Kangpokpi</option>
+																											<option value="370">Kangra</option>
+																											<option value="371">Kanker</option>
+																											<option value="372">Kannauj</option>
+																											<option value="373">Kannur</option>
+																											<option value="374">Kanpur</option>
+																											<option value="375">Kanyakumari</option>
+																											<option value="376">Kapurthala</option>
+																											<option value="377">Karad</option>
+																											<option value="378">Karaikudi</option>
+																											<option value="379">Karauli</option>
+																											<option value="380">Karbi Anglong</option>
+																											<option value="381">Kargil</option>
+																											<option value="382">Karimganj</option>
+																											<option value="383">Karimnagar</option>
+																											<option value="384">Karnal</option>
+																											<option value="385">Karur</option>
+																											<option value="386">Karwar</option>
+																											<option value="387">Kasaragod</option>
+																											<option value="388">Kasganj</option>
+																											<option value="389">Kashipur</option>
+																											<option value="390">Kathua</option>
+																											<option value="391">Katihar</option>
+																											<option value="392">Katni</option>
+																											<option value="393">Kaushambi</option>
+																											<option value="394">Kavali</option>
+																											<option value="395">Kendrapara</option>
+																											<option value="396">Kendujhar</option>
+																											<option value="397">Khagaria</option>
+																											<option value="398">Khammam</option>
+																											<option value="399">Khandwa</option>
+																											<option value="400">Khanna</option>
+																											<option value="401">Kharagpur</option>
+																											<option value="402">Khargone</option>
+																											<option value="403">Khawzawl</option>
+																											<option value="404">Kheda</option>
+																											<option value="405">Khowai</option>
+																											<option value="406">Khunti</option>
+																											<option value="407">Kinnaur</option>
+																											<option value="408">Kiphire</option>
+																											<option value="409">Kishanganj</option>
+																											<option value="410">Kishtwar</option>
+																											<option value="411">Kochi</option>
+																											<option value="412">Kodagu</option>
+																											<option value="413">Kodaikanal</option>
+																											<option value="414">Koderma</option>
+																											<option value="415">Kohima</option>
+																											<option value="416">Kokrajhar</option>
+																											<option value="417">Kolasib</option>
+																											<option value="418">Kolhapur</option>
+																											<option value="419">Kollam</option>
+																											<option value="420">Kondagaon</option>
+																											<option value="421">Koppal</option>
+																											<option value="422">Koraput</option>
+																											<option value="423">Korba</option>
+																											<option value="424">Koriya</option>
+																											<option value="425">Kota</option>
+																											<option value="426">Kottayam</option>
+																											<option value="427">Kozhikode</option>
+																											<option value="428">Krishna</option>
+																											<option value="429">Krishnagiri</option>
+																											<option value="430">Krishnanagar</option>
+																											<option value="431">Kullu</option>
+																											<option value="432">Kupwara</option>
+																											<option value="433">Kurnool</option>
+																											<option value="434">Kurukshetra</option>
+																											<option value="435">Kushinagar</option>
+																											<option value="436">Kutch</option>
+																											<option value="437">Lahaul And Spiti</option>
+																											<option value="438">Lakhimpur</option>
+																											<option value="439">Lakhisarai</option>
+																											<option value="440">Lalitpur</option>
+																											<option value="441">Lataguri</option>
+																											<option value="442">Latehar</option>
+																											<option value="443">Latur</option>
+																											<option value="444">Lawngtlai</option>
+																											<option value="445">Leh</option>
+																											<option value="446">Lohardaga</option>
+																											<option value="447">Lohit</option>
+																											<option value="448">Lonavala</option>
+																											<option value="449">Longding</option>
+																											<option value="450">Longleng</option>
+																											<option value="451">Lower Dibang Valley</option>
+																											<option value="452">Lower Subansiri</option>
+																											<option value="453">Lucknow</option>
+																											<option value="454">Ludhiana</option>
+																											<option value="455">Lunglei</option>
+																											<option value="456">Madanapalle</option>
+																											<option value="457">Madhepura</option>
+																											<option value="458">Madhubani</option>
+																											<option value="459">Madurai</option>
+																											<option value="460">Mahabaleshwar</option>
+																											<option value="461">Maharajganj</option>
+																											<option value="462">Mahasamund</option>
+																											<option value="463">Mahendragarh</option>
+																											<option value="464">Mahisagar</option>
+																											<option value="465">Mahoba</option>
+																											<option value="466">Mainpuri</option>
+																											<option value="467">Malappuram</option>
+																											<option value="468">Malda</option>
+																											<option value="469">Malegaon</option>
+																											<option value="470">Malkangiri</option>
+																											<option value="471">Mamit</option>
+																											<option value="472">Mancherial</option>
+																											<option value="473">Mandi</option>
+																											<option value="474">Mandla</option>
+																											<option value="475">Mandsaur</option>
+																											<option value="476">Mandya</option>
+																											<option value="477">Mangalore</option>
+																											<option value="478">Mansa</option>
+																											<option value="479">Mathura</option>
+																											<option value="480">Mau</option>
+																											<option value="481">Mayiladuthurai</option>
+																											<option value="482">Mayurbhanj</option>
+																											<option value="483">Medak</option>
+																											<option value="484">Meerut</option>
+																											<option value="485">Mehsana</option>
+																											<option value="486">Mewat</option>
+																											<option value="487">Mhow</option>
+																											<option value="488">Miryalaguda</option>
+																											<option value="489">Mirzapur</option>
+																											<option value="490">Modasa</option>
+																											<option value="491">Moga</option>
+																											<option value="492">Mohali</option>
+																											<option value="493">Mokokchung</option>
+																											<option value="494">Mon</option>
+																											<option value="495">Moradabad</option>
+																											<option value="496">Morbi</option>
+																											<option value="497">Morena</option>
+																											<option value="498">Morigaon</option>
+																											<option value="499">Morinda</option>
+																											<option value="500">Motihari</option>
+																											<option value="501">Mughalsarai</option>
+																											<option value="502">Mulugu</option>
+																											<option value="503">Mungeli</option>
+																											<option value="504">Munger</option>
+																											<option value="505">Murshidabad</option>
+																											<option value="506">Mussoorie</option>
+																											<option value="507">Muzaffarnagar</option>
+																											<option value="508">Muzaffarpur</option>
+																											<option value="509">Mysore</option>
+																											<option value="510">Nabarangpur</option>
+																											<option value="511">Nabha</option>
+																											<option value="512">Nadia</option>
+																											<option value="513">Nadiad</option>
+																											<option value="514">Nagaon</option>
+																											<option value="515">Nagapattinam</option>
+																											<option value="516">Nagarkurnool</option>
+																											<option value="517">Nagaur</option>
+																											<option value="518">Nagercoil</option>
+																											<option value="519">Nagpur</option>
+																											<option value="520">Nainital</option>
+																											<option value="521">Nalanda</option>
+																											<option value="522">Nalbari</option>
+																											<option value="523">Nalgonda</option>
+																											<option value="524">Namakkal</option>
+																											<option value="525">Namsai</option>
+																											<option value="526">Nanded</option>
+																											<option value="527">Nandurbar</option>
+																											<option value="528">Nandyala</option>
+																											<option value="529">Narasaraopet</option>
+																											<option value="530">Narayanpet</option>
+																											<option value="531">Narayanpur</option>
+																											<option value="532">Narmada</option>
+																											<option value="533">Narsinghpur</option>
+																											<option value="534">Nashik</option>
+																											<option value="535">Nathdwara</option>
+																											<option value="536">Navsari</option>
+																											<option value="537">Nawada</option>
+																											<option value="538">Nawanshahr</option>
+																											<option value="539">Nayagarh</option>
+																											<option value="540">Neemrana</option>
+																											<option value="541">Neemuch</option>
+																											<option value="542">Nellore</option>
+																											<option value="543">Nilgiris</option>
+																											<option value="544">Nirmal</option>
+																											<option value="545">Niwari</option>
+																											<option value="546">Nizamabad</option>
+																											<option value="547">Noklak</option>
+																											<option value="548">Noney</option>
+																											<option value="549">North Garo Hills</option>
+																											<option value="550">North Sikkim</option>
+																											<option value="551">North Tripura</option>
+																											<option value="552">Nuapada</option>
+																											<option value="553">Ongole</option>
+																											<option value="554">Ooty</option>
+																											<option value="555">Osmanabad</option>
+																											<option value="556">Pakur</option>
+																											<option value="557">Palakkad</option>
+																											<option value="558">Palakollu</option>
+																											<option value="559">Palamu</option>
+																											<option value="560">Palanpur</option>
+																											<option value="561">Pali</option>
+																											<option value="562">Palwal</option>
+																											<option value="563">Panchkula</option>
+																											<option value="564">Panchmahal</option>
+																											<option value="565">Panipat</option>
+																											<option value="566">Panna</option>
+																											<option value="567">Papum Pare</option>
+																											<option value="568">Parbhani</option>
+																											<option value="569">Pardi</option>
+																											<option value="570">Patan</option>
+																											<option value="571">Pathanamthitta</option>
+																											<option value="572">Pathankot</option>
+																											<option value="573">Patiala</option>
+																											<option value="574">Patna</option>
+																											<option value="575">Pauri Garhwal</option>
+																											<option value="576">Peddapalli</option>
+																											<option value="577">Perambalur</option>
+																											<option value="578">Peren</option>
+																											<option value="579">Phaltan</option>
+																											<option value="580">Phek</option>
+																											<option value="581">Pherzawl</option>
+																											<option value="582">Phusro</option>
+																											<option value="583">Pilibhit</option>
+																											<option value="584">Pithoragarh</option>
+																											<option value="585">Pollachi</option>
+																											<option value="586">Pondicherry</option>
+																											<option value="587">Poonch</option>
+																											<option value="588">Porbandar</option>
+																											<option value="589">Prakasam</option>
+																											<option value="590">Pratapgarh</option>
+																											<option value="591">Proddatur</option>
+																											<option value="592">Pudukkottai</option>
+																											<option value="593">Pulwama</option>
+																											<option value="594">Purba Medinipur</option>
+																											<option value="595">Puri</option>
+																											<option value="596">Purnea</option>
+																											<option value="597">Purulia</option>
+																											<option value="598">Raebareli</option>
+																											<option value="599">Raichur</option>
+																											<option value="600">Raigad</option>
+																											<option value="601">Raigarh</option>
+																											<option value="602">Raipur</option>
+																											<option value="603">Raisen</option>
+																											<option value="604">Rajahmundry</option>
+																											<option value="605">Rajgarh</option>
+																											<option value="606">Rajkot</option>
+																											<option value="607">Rajnandgaon</option>
+																											<option value="608">Rajouri</option>
+																											<option value="609">Rajpura</option>
+																											<option value="610">Rajsamand</option>
+																											<option value="611">Ramanathapuram</option>
+																											<option value="612">Ramgarh</option>
+																											<option value="613">Ramnagar</option>
+																											<option value="614">Rampur</option>
+																											<option value="615">Ranchi</option>
+																											<option value="616">Ranikhet</option>
+																											<option value="617">Ranipet</option>
+																											<option value="618">Ras Al Khaimah</option>
+																											<option value="619">Ratlam</option>
+																											<option value="620">Ratnagiri</option>
+																											<option value="621">Rayagada</option>
+																											<option value="622">Reasi</option>
+																											<option value="623">Rewa</option>
+																											<option value="624">Rewari</option>
+																											<option value="625">Ri Bhoi</option>
+																											<option value="626">Rishikesh</option>
+																											<option value="627">Rohtak</option>
+																											<option value="628">Rohtas</option>
+																											<option value="629">Roorkee</option>
+																											<option value="630">Rourkela</option>
+																											<option value="631">Rudraprayag</option>
+																											<option value="632">Rudrapur</option>
+																											<option value="633">Rupnagar</option>
+																											<option value="634">Sabarkantha</option>
+																											<option value="635">Sagar</option>
+																											<option value="636">Saharanpur</option>
+																											<option value="637">Saharsa</option>
+																											<option value="638">Sahibganj</option>
+																											<option value="639">Salem</option>
+																											<option value="640">Samastipur</option>
+																											<option value="641">Samba</option>
+																											<option value="642">Sambalpur</option>
+																											<option value="643">Sambhal</option>
+																											<option value="644">Sanand</option>
+																											<option value="645">Sangli</option>
+																											<option value="646">Sangrur</option>
+																											<option value="647">Sant Kabir Nagar</option>
+																											<option value="648">Saran</option>
+																											<option value="649">Sasaram</option>
+																											<option value="650">Satara</option>
+																											<option value="651">Satna</option>
+																											<option value="652">Sawaimadhopur</option>
+																											<option value="653">Sehore</option>
+																											<option value="654">Senapati</option>
+																											<option value="655">Seoni</option>
+																											<option value="656">Seraikela Kharsawan</option>
+																											<option value="657">Serchhip</option>
+																											<option value="658">Shahada</option>
+																											<option value="659">Shahdol</option>
+																											<option value="660">Shahjahanpur</option>
+																											<option value="661">Shajapur</option>
+																											<option value="662">Shamli</option>
+																											<option value="663">Sheikhpura</option>
+																											<option value="664">Sheohar</option>
+																											<option value="665">Shimla</option>
+																											<option value="666">Shirdi</option>
+																											<option value="667">Shivamogga</option>
+																											<option value="668">Shivpuri</option>
+																											<option value="669">Shopian</option>
+																											<option value="670">Shravasti</option>
+																											<option value="671">Siaha</option>
+																											<option value="672">Siddharthnagar</option>
+																											<option value="673">Siddipet</option>
+																											<option value="674">Sidhi</option>
+																											<option value="675">Sikandrabad</option>
+																											<option value="676">Sikar</option>
+																											<option value="677">Silchar</option>
+																											<option value="678">Siliguri</option>
+																											<option value="679">Silvassa</option>
+																											<option value="680">Simdega</option>
+																											<option value="681">Sindhudurg</option>
+																											<option value="682">Singrauli</option>
+																											<option value="683">Sipahijala</option>
+																											<option value="684">Sirmaur</option>
+																											<option value="685">Sirohi</option>
+																											<option value="686">Sirsa</option>
+																											<option value="687">Sitamarhi</option>
+																											<option value="688">Sitapur</option>
+																											<option value="689">Sitarganj</option>
+																											<option value="690">Sivaganga</option>
+																											<option value="691">Sivasagar</option>
+																											<option value="692">Siwan</option>
+																											<option value="693">Sohna</option>
+																											<option value="694">Sojat</option>
+																											<option value="695">Solan</option>
+																											<option value="696">Solapur</option>
+																											<option value="697">Sonbhadra</option>
+																											<option value="698">Sonepat</option>
+																											<option value="699">Sonitpur</option>
+																											<option value="700">South Andaman</option>
+																											<option value="701">South Garo Hills</option>
+																											<option value="702">South Sikkim</option>
+																											<option value="703">South Tripura</option>
+																											<option value="704">Sri Ganganagar</option>
+																											<option value="705">Sri Muktsar Sahib</option>
+																											<option value="706">Srikakulam</option>
+																											<option value="707">Srinagar</option>
+																											<option value="708">Subarnapur</option>
+																											<option value="709">Sukha</option>
+																											<option value="710">Sukma</option>
+																											<option value="711">Sultanpur</option>
+																											<option value="712">Sundargarh</option>
+																											<option value="713">Supaul</option>
+																											<option value="714">Surajpur</option>
+																											<option value="715">Surat</option>
+																											<option value="716">Surendranagar</option>
+																											<option value="717">Surguja</option>
+																											<option value="718">Suryapet</option>
+																											<option value="719">Tadepalligudem</option>
+																											<option value="720">Tamenglong</option>
+																											<option value="721">Tapi</option>
+																											<option value="722">Tarn Taran Sahib</option>
+																											<option value="723">Tawang</option>
+																											<option value="724">Tehri</option>
+																											<option value="725">Tenali</option>
+																											<option value="726">Tengnoupal</option>
+																											<option value="727">Tezpur</option>
+																											<option value="728">Thanjavur</option>
+																											<option value="729">Theni</option>
+																											<option value="730">Thiruvalla</option>
+																											<option value="731">Thiruvananthapuram</option>
+																											<option value="732">Thoothukudi</option>
+																											<option value="733">Thoubal</option>
+																											<option value="734">Thrissur</option>
+																											<option value="735">Tikamgarh</option>
+																											<option value="736">Tinsukia</option>
+																											<option value="737">Tirap</option>
+																											<option value="738">Tiruchengode</option>
+																											<option value="739">Tirunelveli</option>
+																											<option value="740">Tirupathi</option>
+																											<option value="741">Tirupattur</option>
+																											<option value="742">Tiruppur</option>
+																											<option value="743">Tiruvannamalai</option>
+																											<option value="744">Tiruvarur</option>
+																											<option value="745">Tonk</option>
+																											<option value="746">Trichy</option>
+																											<option value="747">Tuensang</option>
+																											<option value="748">Tumkur</option>
+																											<option value="749">Udaipur</option>
+																											<option value="750">Udalguri</option>
+																											<option value="751">Udham Singh Nagar</option>
+																											<option value="752">Udupi</option>
+																											<option value="753">Ujjain</option>
+																											<option value="754">Ukhrul</option>
+																											<option value="755">Umaria</option>
+																											<option value="756">Umbergaon</option>
+																											<option value="757">Una</option>
+																											<option value="758">Unakoti</option>
+																											<option value="759">Unnao</option>
+																											<option value="760">Upper Siang</option>
+																											<option value="761">Upper Subansiri</option>
+																											<option value="762">Uttar Dinajpur</option>
+																											<option value="763">Uttarkashi</option>
+																											<option value="764">Vadodara</option>
+																											<option value="765">Vaishali</option>
+																											<option value="766">Valsad</option>
+																											<option value="767">Vapi</option>
+																											<option value="768">Varanasi</option>
+																											<option value="769">Vellore</option>
+																											<option value="770">Vidisha</option>
+																											<option value="771">Vijayapura</option>
+																											<option value="772">Vijayawada</option>
+																											<option value="773">Vikarabad</option>
+																											<option value="774">Viluppuram</option>
+																											<option value="775">Virudhunagar</option>
+																											<option value="776">Visakhapatnam</option>
+																											<option value="777">Visnagar</option>
+																											<option value="778">Vizianagaram</option>
+																											<option value="779">Vrindavan</option>
+																											<option value="780">Vyara</option>
+																											<option value="781">Walajapet</option>
+																											<option value="782">Wanaparthy</option>
+																											<option value="783">Warangal</option>
+																											<option value="784">Wardha</option>
+																											<option value="785">Washim</option>
+																											<option value="786">Wayanad</option>
+																											<option value="787">West Garo Hills</option>
+																											<option value="788">West Godavari</option>
+																											<option value="789">West Jaintia Hills</option>
+																											<option value="790">West Kameng</option>
+																											<option value="791">West Khasi Hills</option>
+																											<option value="792">West Medinipur</option>
+																											<option value="793">West Siang</option>
+																											<option value="794">West Sikkim</option>
+																											<option value="795">West Singhbhum</option>
+																											<option value="796">West Tripura</option>
+																											<option value="797">Wokha</option>
+																											<option value="798">Yadgir</option>
+																											<option value="799">Yamuna Nagar</option>
+																											<option value="800">Yavatmal</option>
+																											<option value="801">Zirakpur</option>
+																											<option value="802">Zunheboto</option>
+																											<option value="803">East Kameng</option>
+													    
+												</select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!--
+									<div class="col-lg-3 col-md-3 col-sm-12 d-md-none d-lg-block">
+										<div class="form-group">
+											<label>locality</label>
+											<div class="input-with-icon">
+												<select id="txtLocality" class="form-control " name="txtLocality">
+													<option value=''>All Locality</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									-->
+                                        <div class="col-lg-1 col-md-2 col-sm-12 small-padd">
+                                            <div class="form-group none">
+                                                <button type="submit" class="btn search-btn"><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- Collapse Advance Search Form -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ============================ Hero Banner End ================================== -->
+
+        <!-- ============================ Property Type Start ================================== -->
+        <section class="gray-simple min pt-3">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="sec-heading center">
+                            <h2>Featured Property Types</h2>
+                            <p>Find All Type of Property.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg col-md-4">
+                        <!-- Single Category -->
+                        <div class="property_cats_boxs">
+                            <a href="http://www.gharapnaa.com/featured/apartment/1" class="category-box">
+                                <div class="property_category_short">
+                                    <div class="category-icon clip-1"><i class="flaticon-beach-house-2"></i></div>
+                                    <div class="property_category_expand property_category_short-text">
+                                        <h4>Apartment </h4>
+                                        <p>3 Property</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg col-md-4">
+                        <!-- Single Category -->
+                        <div class="property_cats_boxs">
+                            <a href="http://www.gharapnaa.com/featured/independent/1" class="category-box">
+                                <div class="property_category_short">
+                                    <div class="category-icon clip-2">
+                                        <i class="flaticon-cabin"></i>
+                                    </div>
+                                    <div class="property_category_expand property_category_short-text">
+                                        <h4>Independent Home</h4>
+                                        <p>16 Property</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg col-md-4">
+                        <!-- Single Category -->
+                        <div class="property_cats_boxs">
+                            <a href="http://www.gharapnaa.com/featured/plot/1" class="category-box">
+                                <div class="property_category_short">
+                                    <div class="category-icon clip-3">
+                                        <i class="flaticon-apartments"></i>
+                                    </div>
+                                    <div class="property_category_expand property_category_short-text">
+                                        <h4>Plot</h4>
+                                        <p>31 Property</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg col-md-4">
+                        <!-- Single Category -->
+                        <div class="property_cats_boxs">
+                            <a href="http://www.gharapnaa.com/featured/villa/1" class="category-box">
+                                <div class="property_category_short">
+                                    <div class="category-icon clip-4">
+                                        <i class="flaticon-student-housing"></i>
+                                    </div>
+                                    <div class="property_category_expand property_category_short-text">
+                                        <h4>Villa</h4>
+                                        <p>3 Property</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg col-md-4">
+                        <!-- Single Category -->
+                        <div class="property_cats_boxs">
+                            <a href="http://www.gharapnaa.com/featured/agriculture/1" class="category-box">
+                                <div class="property_category_short">
+                                    <div class="category-icon clip-5">
+                                        <i class="flaticon-modern-house-4"></i>
+                                    </div>
+                                    <div class="property_category_expand property_category_short-text">
+                                        <h4> Agriculture Land</h4>
+                                        <p>16 Property</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ============================ Property Type End ================================== -->
+
+        <!-- ============================ Recent Property Start ================================== -->
+
+        <section class="pt-0 min pt-3">
+            <div class="container" style="padding-top: 50px;">
+                <div class="row justify-content-center">
+                    <div class="col-lg-7 col-md-8">
+                        <div class="sec-heading center">
+                            <h2>Featured Listed Property</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+
+                    <!-- Single Property -->
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="property-listing property-2">
+                            <div class="listing-img-wrapper">
+                                <div class="list-img-slide">
+                                    <div class="click">
+                                        <div><a href="http://www.gharapnaa.com/property-details/105"><img src="http://www.gharapnaa.com/uploads/images/IMG_20220608_WA0000_98.jpg" class="img-fluid mx-auto" alt=""  onerror="this.src='http://www.gharapnaa.com/uploads/images/1.jpg';"></a></div>
+                                        <div><a href="http://www.gharapnaa.com/property-details/105"><img src="http://www.gharapnaa.com/uploads/images/20220609_110628_99.jpg" class="img-fluid mx-auto" alt=""  onerror="this.src='http://www.gharapnaa.com/uploads/images/1.jpg';"></a></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="listing-detail-wrapper">
+                                <div class="listing-short-detail-wrap">
+                                    <div class="_card_list_flex mb-2">
+                                        <div class="_card_flex_01">
+                                            <span class="_list_blickes types">Independent Home</span>
+                                        </div>
+                                        <div class="_card_flex_last">
+                                            <h6 class="listing-card-info-price mb-0">&#8377;12000000</h6>
+                                        </div>
+                                    </div>
+                                    <!--<div class="_card_list_flex">
+										<div class="_card_flex_01">
+											<h4 class="listing-name verified"><a href="http://www.gharapnaa.com/property-details/105" class="prt-link-detail">Nizamabad</a></h4>
+										</div>
+									</div>-->
+                                </div>
+                            </div>
+
+                            <div class="price-features-wrapper">
+                                <div class="list-fx-features">
+                                    <div class="listing-card-info-icon">
+                                        <div class="inc-fleat-icon"><img src="http://www.gharapnaa.com/assets/img/bed.svg" alt="" width="13"></div>2 BHK </div>
+                                    <div class="listing-card-info-icon">
+                                        <div class="inc-fleat-icon"><img src="http://www.gharapnaa.com/assets/img/bathtub.svg" alt="" width="13"></div>2 Bath
+                                    </div>
+                                    <div class="listing-card-info-icon">
+                                        <div class="inc-fleat-icon"><img src="http://www.gharapnaa.com/assets/img/move.svg" alt="" width="13"></div> 247 sq.yd </div>
+                                </div>
+                            </div>
+                            <div class="listing-detail-footer">
+                                <div class="footer-first">
+                                    <div class="foot-location"><img src="http://www.gharapnaa.com/assets/img/pin.svg" alt="" width="18">Nizamabad</div>
+                                </div>
+                                <div class="footer-flex">
+                                    <ul class="selio_style">
+                                        <li>
+                                            <div class="prt_saveed_12lk">
+                                                <label class="toggler toggler-danger btnwish " data-id="105" data-wlid="" data-toggle="tooltip" data-placement="top" data-original-title="Save property"><input type="checkbox"><i class="ti-heart"></i></label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="prt_saveed_12lk">
+                                                <a href="http://www.gharapnaa.com/property-details/105" data-toggle="tooltip" data-placement="top" data-original-title="View Property"><i class="ti-arrow-right"></i></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Single Property -->
+
+                    <!-- Single Property -->
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="property-listing property-2">
+                            <div class="listing-img-wrapper">
+                                <div class="list-img-slide">
+                                    <div class="click">
+                                        <div><a href="http://www.gharapnaa.com/property-details/104"><img src="http://www.gharapnaa.com/uploads/images/IMG_20220520_WA0022_96.jpg" class="img-fluid mx-auto" alt=""  onerror="this.src='http://www.gharapnaa.com/uploads/images/1.jpg';"></a></div>
+                                        <div><a href="http://www.gharapnaa.com/property-details/104"><img src="http://www.gharapnaa.com/uploads/images/IMG_20220520_WA0022_97.jpg" class="img-fluid mx-auto" alt=""  onerror="this.src='http://www.gharapnaa.com/uploads/images/1.jpg';"></a></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="listing-detail-wrapper">
+                                <div class="listing-short-detail-wrap">
+                                    <div class="_card_list_flex mb-2">
+                                        <div class="_card_flex_01">
+                                            <span class="_list_blickes types">Plot</span>
+                                        </div>
+                                        <div class="_card_flex_last">
+                                            <h6 class="listing-card-info-price mb-0">&#8377;2264000</h6>
+                                        </div>
+                                    </div>
+                                    <!--<div class="_card_list_flex">
+										<div class="_card_flex_01">
+											<h4 class="listing-name verified"><a href="http://www.gharapnaa.com/property-details/104" class="prt-link-detail">Nizamabad</a></h4>
+										</div>
+									</div>-->
+                                </div>
+                            </div>
+
+                            <div class="price-features-wrapper">
+                                <div class="inc-fleat-icon"><img src="http://www.gharapnaa.com/assets/img/move.svg" alt="" width="13"></div>283 sq.yd </div>
+                            <div class="listing-detail-footer">
+                                <div class="footer-first">
+                                    <div class="foot-location"><img src="http://www.gharapnaa.com/assets/img/pin.svg" alt="" width="18">Nizamabad</div>
+                                </div>
+                                <div class="footer-flex">
+                                    <ul class="selio_style">
+                                        <li>
+                                            <div class="prt_saveed_12lk">
+                                                <label class="toggler toggler-danger btnwish " data-id="104" data-wlid="" data-toggle="tooltip" data-placement="top" data-original-title="Save property"><input type="checkbox"><i class="ti-heart"></i></label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="prt_saveed_12lk">
+                                                <a href="http://www.gharapnaa.com/property-details/104" data-toggle="tooltip" data-placement="top" data-original-title="View Property"><i class="ti-arrow-right"></i></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Single Property -->
+
+                    <!-- Single Property -->
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="property-listing property-2">
+                            <div class="listing-img-wrapper">
+                                <div class="list-img-slide">
+                                    <div class="click">
+                                        <div><a href="http://www.gharapnaa.com/property-details/102"><img src="http://www.gharapnaa.com/uploads/images/IMG_20220528_WA0000_95.jpg" class="img-fluid mx-auto" alt=""  onerror="this.src='http://www.gharapnaa.com/uploads/images/1.jpg';"></a></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="listing-detail-wrapper">
+                                <div class="listing-short-detail-wrap">
+                                    <div class="_card_list_flex mb-2">
+                                        <div class="_card_flex_01">
+                                            <span class="_list_blickes types">Plot</span>
+                                        </div>
+                                        <div class="_card_flex_last">
+                                            <h6 class="listing-card-info-price mb-0">&#8377;2796000</h6>
+                                        </div>
+                                    </div>
+                                    <!--<div class="_card_list_flex">
+										<div class="_card_flex_01">
+											<h4 class="listing-name verified"><a href="http://www.gharapnaa.com/property-details/102" class="prt-link-detail">Nizamabad</a></h4>
+										</div>
+									</div>-->
+                                </div>
+                            </div>
+
+                            <div class="price-features-wrapper">
+                                <div class="inc-fleat-icon"><img src="http://www.gharapnaa.com/assets/img/move.svg" alt="" width="13"></div>233 sq.yd </div>
+                            <div class="listing-detail-footer">
+                                <div class="footer-first">
+                                    <div class="foot-location"><img src="http://www.gharapnaa.com/assets/img/pin.svg" alt="" width="18">Nizamabad</div>
+                                </div>
+                                <div class="footer-flex">
+                                    <ul class="selio_style">
+                                        <li>
+                                            <div class="prt_saveed_12lk">
+                                                <label class="toggler toggler-danger btnwish " data-id="102" data-wlid="" data-toggle="tooltip" data-placement="top" data-original-title="Save property"><input type="checkbox"><i class="ti-heart"></i></label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="prt_saveed_12lk">
+                                                <a href="http://www.gharapnaa.com/property-details/102" data-toggle="tooltip" data-placement="top" data-original-title="View Property"><i class="ti-arrow-right"></i></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Single Property -->
+
+                </div>
+            </div>
+        </section>
+        <!-- ============================ Call To Action ================================== -->
+        <section class="theme-bg call_action_wrap-wrap">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        <div class="call_action_wrap">
+                            <div class="call_action_wrap-head">
+                                <h3>Do You Have Questions ?</h3>
+                                <span>We'll help you to grow your career and growth.</span>
+                            </div>
+                            <a href="http://www.gharapnaa.com/contact" class="btn btn-call_action_wrap">Contact Us Today</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- ============================ Call To Action End ================================== -->
+        <footer class="dark-footer skin-dark-footer style-2">
+            <div class="footer-middle">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4">
+                            <div class="footer_widget">
+                                <img src="http://www.gharapnaa.com/assets/img/logo-light.png" class="img-footer small mb-2" alt="">
+                                <p class=" mt-3">Query for Residential properties for lease, purchase, sell in India 100 percent Genuine Owners. India's first Real Estate Property Website. Get Rent Agreement, Property Management and Registration Service in India. Proprietors
+                                    and NRI can List/Post Property Ad for Free.</p>
+                                <div class="foot-news-last">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8 col-md-8 ml-auto">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4">
+                                    <div class="footer_widget">
+                                        <h4 class="widget_title">Important Links</h4>
+                                        <ul class="footer-menu">
+                                            <!--<li><a href="http://www.gharapnaa.com/">Home Page</a></li>-->
+                                            <li><a href="http://www.gharapnaa.com/about-us">About</a></li>
+                                            <li><a href="http://www.gharapnaa.com/contact">Contact</a></li>
+                                            <li><a href="http://www.gharapnaa.com/property-list">Buy</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-md-8">
+                                    <div class="footer_widget">
+                                        <h4 class="widget_title">Contact Us</h4>
+                                        <div>
+                                            RAJAVATAR CONSTRUCTIONS,<br /> ATS Marvel complex, <br /> H.No: 3-10-459, 2nd FLOOR, Opp: Hanuman Temple, <br /> Chandra Nagar main road, Nizamabad, Telangana-503001. <br /> Contact : 7013107291 & 9003227387
+                                        </div>
+                                        <!--<ul class="footer-menu">
+                                    <li><a href="mailto:sales@gharapnaa.com">sales@gharapnaa.com</a></li>
+                                    <li><a href="tel:+01 215 245 6258">+01 215 245 6258 </a></li>
+                                 </ul>-->
+                                    </div>
+                                </div>
+                                <!--<div class="col-lg-4 col-md-4">
+                              <div class="footer_widget">
+                                 <h4 class="widget_title">All Sections</h4>
+                                 <ul class="footer-menu">
+                                    <li><a href="#">Sell</a></li>
+                                    <li><a href="#">Independent Home</a></li>
+                                    <li><a href="#">Plot</a></li>
+                                 </ul>
+                              </div>
+                           </div>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-12 col-md-12 text-center">
+                            <p class="mb-0">© 2021 Gharapnaa. Designd By <a target="_blank" href="http://redesigns.in/">redesigns.in</a>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- ============================ Footer End ================================== -->
+        <!-- Log In Modal -->
+        <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="registermodal" aria-hidden="true">
+            <div class="modal-dialog modal-xl login-pop-form" role="document">
+                <div class="modal-content overli" id="registermodal">
+                    <div class="modal-body p-0">
+                        <div class="resp_log_wrap">
+                            <div class="resp_log_thumb" style="background:url(http://www.gharapnaa.com/assets/img/log.jpg)no-repeat;"></div>
+                            <div class="resp_log_caption form_err_text">
+                                <div class="edlio_152">
+                                    <div class="log-close" onclick="goToLog();"><i class="fa fa-times"></i></div>
+                                    <ul class="nav nav-pills tabs_system center" id="pills-tab" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="pills-login-tab" data-toggle="pill" href="#pills-login" role="tab" aria-controls="pills-login" aria-selected="true"><i class="fas fa-sign-in-alt mr-2"></i>Login</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="pills-signup-tab" data-toggle="pill" href="#pills-signup" role="tab" aria-controls="pills-signup" aria-selected="false"><i class="fas fa-user-plus mr-2"></i>Register</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content" id="pills-tabContent">
+                                    <div class="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="pills-login-tab">
+                                        <div class="login-form">
+                                            <form class="frmlogin" id="frmlogin">
+                                                <input type="hidden" name="action" value="loginuser">
+                                                <div class="form-group">
+                                                    <label>User Name</label>
+                                                    <div class="input-with-icon">
+                                                        <input type="text" class="form-control lrequired" name="uname" style="padding-left: 26px !important;">
+                                                        <i class="ti-user"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Password</label>
+                                                    <div class="input-with-icon">
+                                                        <input type="password" class="form-control lrequired" name="pwd" style="padding-left: 26px !important;">
+                                                        <i class="ti-unlock"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="eltio_ol9">
+                                                        <div class="eltio_k2">
+                                                            <a id="pills-reset-tab" data-toggle="pill" href="#pills-reset" role="tab" aria-controls="pills-reset" aria-selected="false">Lost Your Password?</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <button type="button" class="btn btn-md full-width pop-login" id="btnlogin">Login</button>
+                                                </div>
+                                                <div class="noty text-danger"></div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="pills-signup" role="tabpanel" aria-labelledby="pills-signup-tab">
+                                        <div class="login-form">
+                                            <form class="frmregister" id="frmregister">
+                                                <input type="hidden" name="action" value="registeruser">
+                                                <div id="hideReg">
+                                                    <div class="form-group">
+                                                        <label>Full Name</label><span class="text-danger"> * <span id="err_uname" class="err-msg"></span></span>
+                                                        <div class="input-with-icon">
+                                                            <input type="text" class="form-control requiredre mand-err" name="uname" style="padding-left: 26px !important;" id="uname" onkeyup="checkValidate('uname', /^[A-Za-z ]+$/, '(Enter characters only.)');">
+                                                            <i class="ti-user"></i>
+                                                        </div>
+                                                    </div>
+                                                    <!--<div class="form-group">
+											  <label>Email ID</label><span class="text-danger"> * <span id="err_emailid" class="err-msg"></span></span>
+											  <div class="input-with-icon">
+												 <input type="email" class="form-control requiredre mand-err" name="emailid" style="padding-left: 26px !important;" id="emailid" onblur="setUserId('emailid', 'user_id');" onkeyup="checkValidate('emailid', /^([\w-\.]+@([\w-]+\.)+[\w-]{2,15})?$/, '', ['Please Enter Email', 'Invalid Mail.']);">
+												 <i class="ti-user"></i>
+											  </div>
+										   </div>-->
+
+                                                    <div class="form-group">
+                                                        <label>Email ID</label><span class="text-danger"> * <span id="err_emailid" class="notify-otp err-msg"></span></span>
+                                                        <div class="input-group mb-3">
+                                                            <input type="text" class="form-control requiredre mand-err" name="emailid" id="emailid" placeholder="Email Id" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-danger p-5px" type="button" id="regMailOTP" onclick="checkValidate('emailid', /^([\w-\.]+@([\w-]+\.)+[\w-]{2,15})?$/, '', ['Please Enter Email', 'Invalid Mail.'])">Send OTP</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Mobile</label><span class="text-danger"> * <span id="err_mobile" class="err-msg"></span></span>
+                                                        <div class="input-with-icon">
+                                                            <input type="text" class="form-control requiredre mand-err" name="mobile" style="padding-left: 26px !important;" id="mobile" onkeyup="checkValidate('mobile', /^[0-9]{0,15}$/, '(Enter digits only.)');">
+                                                            <i class="ti-user"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>OTP</label><span class="text-danger"> * <span class="notify-verifyotp"></span></span>
+                                                        <div class="input-group mb-3">
+                                                            <input type="text" class="form-control requiredre" name="reg_verify_otp" id="reg_verify_otp" placeholder="OTP" aria-label="otp" aria-describedby="otp" maxlength="6" />
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-danger p-5px" type="button" id="regVerifyOTP" onclick="checkValidate('reg_verify_otp', /^[0-9]{0,6}$/, '', ['', 'Digits Only.'])">Verify</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="enableReg" class="hide">
+                                                    <div class="form-group">
+                                                        <label>User Id</label><span class="text-danger"> * <span id="err_mobile" class="err-msg"></span></span>
+                                                        <div class="input-with-icon">
+                                                            <input type="text" class="form-control requiredre mand-err" name="user_id" style="padding-left: 26px !important;" id="user_id" onkeyup="checkValidate('user_id', '', '(Enter user id.)');" />
+                                                            <i class="ti-user"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Password</label><span class="text-danger"> * <span id="err_pwd" class="err-msg"></span></span>
+                                                        <div class="input-with-icon">
+                                                            <input type="password" class="form-control requiredre mand-err" name="pwd" id="pwd" onblur="matchPassword('reg');" style="padding-left: 26px !important;">
+                                                            <i class="ti-unlock"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Confirm Password</label><span class="text-danger"> * <span id="err_cpwd" class="err-msg"></span></span>
+                                                        <div class="input-with-icon">
+                                                            <input type="password" class="form-control requiredre mand-err" name="cpwd" id="cpwd" onblur="matchPassword('reg');" style="padding-left: 26px !important;">
+                                                            <i class="ti-unlock"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="eltio_ol9">
+                                                            <div class="eltio_k1">
+                                                                <!-- <input id="dds" class="checkbox-custom" name="dds" type="checkbox">
+													   <label for="dds" class="checkbox-custom-label">By using the website, you accept the terms and conditions</label> -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <button type="button" class="btn btn-md full-width pop-login disabled" id="btnregister">Register</button>
+                                                </div>
+                                                <!--<div class="noty text-danger"></div>-->
+                                                <div class="notify"></div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="pills-reset" role="tabpanel" aria-labelledby="pills-reset-tab">
+                                        <div class="login-form">
+                                            <form class="frmreset" id="frmreset">
+                                                <input type="hidden" name="action" value="resetpwd">
+                                                <div class="form-group">
+                                                    <label>Email ID/Mobile</label><span class="text-danger"> * <span class="notify-otp"></span></span>
+                                                    <div class="input-group mb-3">
+                                                        <input type="text" class="form-control requiredpwd" name="txtuser" id="forgot_email" placeholder="Email Id" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-danger p-5px" type="button" id="mailOTP" onclick="checkValidate('forgot_email', /^([\w-\.]+@([\w-]+\.)+[\w-]{2,15})?$/, '', ['Please Enter Email', 'Invalid Mail.'])">Send OTP</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>OTP</label><span class="text-danger"> * <span class="notify-verifyotp"></span></span>
+                                                    <div class="input-group mb-3">
+                                                        <input type="text" class="form-control requiredpwd" name="verify_otp" id="verify_otp" placeholder="OTP" aria-label="otp" aria-describedby="otp" maxlength="6" />
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-danger p-5px" type="button" id="verifyOTP" onclick="checkValidate('verify_otp', /^[0-9]{0,6}$/, '', ['Please Enter Phone', 'Digits Only.'])">Verify</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="enable-pwd"></div>
+
+                                                <div class="form-group">
+                                                    <button type="button" class="btn btn-md full-width pop-login disabled" id="btnreset">Reset</button>
+                                                </div>
+                                                <div class="notify"></div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Modal -->
+        <!-- Send Message -->
+        <div class="modal fade" id="autho-message" tabindex="-1" role="dialog" aria-labelledby="authomessage" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered login-pop-form" role="document">
+                <div class="modal-content" id="authomessage">
+                    <span class="mod-close" data-dismiss="modal" aria-hidden="true"><i class="ti-close"></i></span>
+                    <div class="modal-body">
+                        <h4 class="modal-header-title">Drop Message</h4>
+                        <div class="login-form">
+                            <form>
+                                <div class="form-group">
+                                    <label>Subject</label>
+                                    <div class="input-with-icons">
+                                        <input type="text" class="form-control" placeholder="Message Title">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Messages</label>
+                                    <div class="input-with-icons">
+                                        <textarea class="form-control ht-80"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-md full-width pop-login">Send Message</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Modal -->
+        <a id="back2Top" class="top-scroll" title="Back to top" href="#"><i class="ti-arrow-up"></i></a>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Wrapper -->
+    <!-- ============================================================== -->
+    <script>
+        function goToLog() {
+            var siteUrl = "http://www.gharapnaa.com";
+            window.location.href = siteUrl;
+        }
+        /* ================= Check Validation ============== */
+        /* function onChangeFunction(id, value, min, max)
+        {
+        	if(min>=0 && max>0)
+        	{
+        		if(parseInt(value)<min || parseInt(value)>max)
+        		{
+        			var msg = "value should be "+min+" to "+max+".";
+        		}
+        		$("#err_"+id).text(msg);
+        	}
+        }	 */
+        function throwError(id, that, hasClass) {
+            $("." + id).addClass('has-error');
+            $(that).addClass('has-error');
+            $(that).parent().addClass('txt-error');
+            if ($(that).hasClass(hasClass)) {
+                $(that).parent().parent().addClass('txt-error');
+            }
+        }
+
+        function checkValidate(id, regExp, errMsg, errArr = [], min = 0, max = 0) {
+            var valid = true;
+            var isZero = true;
+
+            var value = $("#" + id).val();
+            //$(".has-error").removeClass("has-error");
+            //$(".txt-error").removeClass("txt-error");
+            /* 
+            	txtbuildarea
+            	txtcost
+            	plot_price
+
+            */
+            if (value == '') {
+                var msg = (errArr.length > 0 && typeof(errArr[0]) != 'undefined') ? errArr[0] : errMsg;
+                $("#err_" + id).text(msg);
+                $("#" + id).addClass("has-error");
+                $(this).parent().addClass('txt-error');
+                if ($(this).hasClass("mand-err")) {
+                    $(this).parent().parent().addClass('txt-error');
+                }
+                return;
+            } else {
+                $("#err_" + id).text('');
+                $("#" + id).removeClass("has-error");
+                $("#" + id).parent().removeClass('txt-error');
+                if ($("#" + id).hasClass("mand-err")) {
+                    $("#" + id).parent().parent().removeClass('txt-error');
+                }
+            }
+
+            if (id == 'txtbuildarea' || id == 'txtcost' || id == 'plot_price') {
+                if (value == '0' || value == 0) {
+                    var msg = "value must not be 0.";
+                    $("#err_" + id).text(msg);
+                    $("#" + id).addClass("has-error");
+                    $(this).parent().addClass('txt-error');
+                    if ($(this).hasClass("mand-err")) {
+                        $(this).parent().parent().addClass('txt-error');
+                    }
+                    return;
+                }
+            }
+
+            if (min >= 0 && max > 0) {
+                if (parseInt(value) < min || parseInt(value) > max) {
+                    var msg = "value should be " + min + " to " + max + ".";
+                }
+                throwError(id, $(this), "mand-err");
+                setTimeout(function() {
+                    $("#err_" + id).text(msg);
+                }, 500);
+            }
+
+            if (regExp != '') {
+                var regExp = new RegExp(regExp);
+                if (!regExp.test(value)) {
+                    var msg = (errArr.length > 0 && typeof(errArr[1]) != 'undefined') ? errArr[1] : errMsg;
+                    $("#err_" + id).text(msg);
+                    $("#" + id).addClass("has-error");
+                    $("#" + id).parent().addClass('txt-error');
+                    if ($("#" + id).hasClass("mand-err")) {
+                        $("#" + id).parent().parent().addClass('txt-error');
+                    }
+                } else {
+                    $("#err_" + id).text('');
+                    $("#" + id).removeClass("has-error");
+                    $("#" + id).parent().removeClass('txt-error');
+                    if ($("#" + id).hasClass("mand-err")) {
+                        $("#" + id).parent().parent().removeClass('txt-error');
+                    }
+                }
+
+                //console.log(!regExp.test(value))
+                return;
+            }
+        }
+        /* ================= Check Validation ============== */
+
+        /* ============== Password Match ============ */
+        function matchPassword(type = 'reg') {
+            var type = (type == 'reg') ? '' : 1;
+            var pwd = $("#pwd" + type).val();
+            var cpwd = $("#cpwd" + type).val();
+
+            if (pwd != '' && cpwd != '' && (pwd != cpwd)) {
+                $("#pwd" + type + ", #cpwd" + type).addClass('has-error');
+                $("#pwd" + type + ", #cpwd" + type).parent().parent().addClass('txt-error');
+                $("#err_pwd" + type + ", #err_cpwd" + type).text('Both passwords should be match.');
+                return false;
+            } else {
+                $("#pwd" + type + ", #cpwd" + type).removeClass('has-error');
+                $("#pwd" + type + ", #cpwd" + type).parent().parent().removeClass('txt-error');
+                $("#err_pwd" + type + ", #err_cpwd" + type).text('');
+                return true;
+            }
+        }
+        /* ============== Password Match ============ */
+        function setUserId(fromId, toId) {
+            var fromVal = $("#" + fromId).val();
+            var toVal = $("#" + toId).val();
+            $("#" + toId).val(((toVal == '') ? fromVal : toVal));
+
+        }
+
+        /* ========== Show Password ======= */
+        /* function showPassword()
+		 {
+			 
+		 } */
+        /* ========== Show Password ======= */
+        $('.headtab').click(function() {
+            //$('a[href="#whatsNew"]').click();
+            $("html, body").animate({
+                scrollTop: 200
+            }, 600);
+        });
+        setTimeout(function() {
+            $(".close-alert").click();
+        }, 5000);
+        $(".page-sidebar").css('max-height', ($(window).height() - 75));
+        $(function() {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+
+        $(document).ready(function() {
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                //MessageService.setError("Invalid Access.");
+                //return;
+                $(".mobile-flag").addClass('collapse');
+                console.log("mobile")
+            }
+        })
+
+        function submitAction(pageId) {
+            var baseUrl = $("#baseUrl").val();
+            $('#pagination_form').attr('action', baseUrl + '/' + pageId);
+            $('#pagination_form').submit();
+        }
+    </script>
+</body>
+
+</html>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.inputselct').select2();
+        $(document).on("change", "#txtloc", function() {
+            $("#txtLocality").html("<option value=''>All Locality</option>");
+            $.ajax({
+                    url: 'http://www.gharapnaa.com/ajax/prop-ajax.php',
+                    type: 'POST',
+                    data: {
+                        "action": "getlocality",
+                        "locid": $(this).val(),
+                        "pcat": $("#ptypes").val()
+                    },
+                    success: function(response) {
+
+                        jsn = $.parseJSON(response);
+                        opwrp = $("#txtLocality");
+                        //$("<option value=''>Select</option>").appendTo(opwrp);
+                        $.each(jsn, function(key, elm) {
+                            //console.log(elm);
+                            $("<option value='" + elm.lo_name + "'>" + elm.lo_name + "</option>").appendTo(opwrp);
+
+                        });
+
+                    }
+                })
+                .done(function() {
+                    //console.log("success");
+                });
+        })
+
+    });
+</script>
